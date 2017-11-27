@@ -1,10 +1,9 @@
 classdef PressureSensor
     properties
         r                  % radial distance from center [m]
-        theta              % angle [degrees]
+        theta              % angle [rad]
         z                  % height [m]
-        currentPressure    % outputted pressure
-        pressureHistory    % oreviouos pressure value
+        pressure           % outputted pressure
     end
     methods
         function obj = PressureSensor(theta_in, z_in)
@@ -17,21 +16,9 @@ classdef PressureSensor
     end
     methods (Static)
         function dist = getDistance(obj, r2, theta2, z)
-            if (theta2 > 180)
-                theta2 = 360 - theta2;
-            end
-            dTheta = abs(theta2 - obj.theta);
-            
-%             dTheta1 = mod(theta2 - obj.theta + 360, 360);
-%             dTheta2 = mod(obj.theta - theta2 + 360, 360);
-%             dTheta = min(dTheta1, dTheta2);
-            
-            dTheta_rad = dTheta * pi /180;
-            avgR = (r2 + obj.r)/2;
-            arcLength = dTheta_rad * avgR;
-            dist = sqrt(arcLength^2 + (z-obj.z)^2);
-%             dist = sqrt((z-obj.z)^2 + r2^2 + obj.r^2 - ...
-%                         2*obj.r*r2*cosd(theta2-obj.theta));
+            dTheta = mod(abs(theta2 - obj.theta), 180);
+            arcLength = dTheta * (r2 + obj.r)/2;
+            dist = arcLength^2 + (z-obj.z)^2;
         end
     end
 end
