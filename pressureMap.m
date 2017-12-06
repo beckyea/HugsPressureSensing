@@ -4,13 +4,12 @@ import PressureSensor
 %% Define Sensors
 height_A = 0.05;
 A1 = PressureSensor(0, height_A);
-A2 = PressureSensor(2*pi*(1/8), height_A);
-A3 = PressureSensor(2*pi*(1/4), height_A);
-A4 = PressureSensor(2*pi*(3/8), height_A);
-A5 = PressureSensor(2*pi*(1/2), height_A);
-A6 = PressureSensor(2*pi*(5/8), height_A);
-A7 = PressureSensor(2*pi*(3/4), height_A);
-A8 = PressureSensor(2*pi*(7/8), height_A);
+A2 = PressureSensor(2*pi*(1/6), height_A);
+A3 = PressureSensor(2*pi*(1/3), height_A);
+A4 = PressureSensor(2*pi*(1/2), height_A);
+A5 = PressureSensor(2*pi*(2/3), height_A);
+A6 = PressureSensor(2*pi*(5/6), height_A);
+
 
 %% Set constants
 a = 0.1778/2; % [m] ellipse major axis
@@ -22,11 +21,23 @@ z_max = 0.052;
 
 %% Gather Pressure Readings from the Sensors
 
-% get port - ls /dev/*.
-% ard = arduino('/dev/tty.usbmodem1411', 'uno', 'Libraries', 'Servo');
-% configurePin(ard, 'A0', 'AnalogInput');
-% configurePin(ard, 'A1', 'AnalogInput');
-% configurePin(ard, 'D3', 'pullup');
+%get port - ls /dev/*.
+ard = arduino('/dev/tty.usbmodem1411', 'uno', 'Libraries', 'Servo');
+configurePin(ard, 'A0', 'AnalogInput');
+configurePin(ard, 'A1', 'AnalogInput');
+configurePin(ard, 'A2', 'AnalogInput');
+configurePin(ard, 'A3', 'AnalogInput');
+configurePin(ard, 'A4', 'AnalogInput');
+configurePin(ard, 'A5', 'AnalogInput');
+configurePin(ard, 'D3', 'pullup');
+
+% while true
+%     avgVal = 0;
+%     for i = 1:1
+%         avgVal = avgVal + readVoltage(ard, 'A0');
+%     end
+%     display(avgVal/1);
+% end
 
 %% Set Sensors Currently Being Read -- ALSO NEED TO DO THIS BELOW
 sensorArray = [A1 A2 A3 A4 A5 A6];
@@ -44,7 +55,7 @@ for z = z_min:deltaZ:z_max
         r = a*b/(sqrt((b*cos(theta))^2+(a*sin(theta))^2));
         totalDistance = 0;
         for sensor = sensorArray
-             distance = max(0.00000001, PressureSensor.getDistance(sensor, r, theta, z));
+             distance = max(0.0000000001, PressureSensor.getDistance(sensor, r, theta, z));
              totalDistance = 1/distance + totalDistance;
         end
         xData(i) = r*cos(theta);
@@ -57,16 +68,18 @@ end
 axis vis3d
 s = scatter3([], [], [], 80, []);
 colorbar
+colormap(jet)
+caxis([0 20])
 set(s, 'XData', xData, 'YData', yData, 'ZData', zData);
 
 while s.BusyAction
     % Initialize Previous Pressure Sensor Readings
-    A1.pressure = 5; % * readVoltage(ard, 'A1');
-    A2.pressure = 1.2;
-    A3.pressure = 8;
-    A4.pressure = 1.2;
-    A5.pressure = 5;% * readVoltage(ard, 'A0');
-    A6.pressure = 1.2;
+    A1.pressure = 291 * readVoltage(ard, 'A0');
+    A2.pressure = 291 * readVoltage(ard, 'A1');
+    A3.pressure = 291 * readVoltage(ard, 'A2');
+    A4.pressure = 291 * readVoltage(ard, 'A3');
+    A5.pressure = 291 * readVoltage(ard, 'A4');
+    A6.pressure = 291 * readVoltage(ard, 'A5');
     
     %% Set Sensors Currently Being Read -- ALSO NEED TO DO THIS ABOVE
     sensorArray = [A1 A2 A3 A4 A5 A6];
@@ -78,7 +91,7 @@ while s.BusyAction
             pressureSum = 0;
             r = a*b/(sqrt((b*cos(theta))^2+(a*sin(theta))^2));
             for sensor = sensorArray
-                distance = max(0.00000001, PressureSensor.getDistance(sensor, r, theta, z));
+                distance = max(0.000001, PressureSensor.getDistance(sensor, r, theta, z));
                 weight = 1/(distance*totalDistances(1, i));
                 pressureSum = pressureSum + sensor.pressure*weight;
             end
@@ -88,6 +101,7 @@ while s.BusyAction
     end
     set(s, 'CData', colData);
     drawnow
-    %disp('update')
+    
+    %[A1.pressure A2.pressure A3.pressure A4.pressure A5.pressure A6.pressure]
 end
 clear ard

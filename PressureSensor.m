@@ -11,7 +11,7 @@ classdef PressureSensor
            b = 0.1270/2;
            obj.theta = theta_in;
            obj.z = z_in;
-           obj.r = a*b/(sqrt((b*cosd(theta_in))^2+(a*sind(theta_in))^2));
+           obj.r = a*b/(sqrt((b*cos(theta_in))^2+(a*sin(theta_in))^2));
         end
     end
     methods (Static)
