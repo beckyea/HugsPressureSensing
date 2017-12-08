@@ -16,8 +16,8 @@ a = 0.1778/2; % [m] ellipse major axis
 b = 0.1270/2; % [m] ellipse minor axis
 deltaTheta = .1; %[deg]
 deltaZ = 0.0005;
-z_min = 0.048;
-z_max = 0.052;
+z_min = 0.05;
+z_max = 0.05;
 
 %% Gather Pressure Readings from the Sensors
 
@@ -44,7 +44,7 @@ sensorArray = [A1 A2 A3 A4 A5 A6];
     
 %% Iterate Through Values to set x y z data
 i = 1;
-numVals = floor((z_max-z_min)/deltaZ + 1) * floor(2*pi/deltaTheta + 1) + 1;
+numVals = floor(1) * floor(2*pi/deltaTheta + 1);
 xData = zeros(1, numVals);
 yData = zeros(1, numVals);
 zData = zeros(1, numVals);
@@ -69,8 +69,9 @@ axis vis3d
 s = scatter3([], [], [], 80, []);
 colorbar
 colormap(jet)
-caxis([0 20])
+caxis([0 12])
 set(s, 'XData', xData, 'YData', yData, 'ZData', zData);
+axis off
 
 while s.BusyAction
     % Initialize Previous Pressure Sensor Readings
