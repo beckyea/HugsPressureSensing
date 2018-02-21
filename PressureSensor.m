@@ -1,17 +1,20 @@
+% Manequin has a = 3.5, b = 2.75
+
 classdef PressureSensor
     properties
-        r                  % radial distance from center [m]
-        theta              % angle [rad]
-        z                  % height [m]
-        pressure           % outputted pressure
+        radialVal
+        x
+        y
+        z
     end
     methods
-        function obj = PressureSensor(theta_in, z_in)
-           a = 0.1778/2;
-           b = 0.1270/2;
-           obj.theta = theta_in;
-           obj.z = z_in;
-           obj.r = a*b/(sqrt((b*cos(theta_in))^2+(a*sin(theta_in))^2));
+        function obj = PressureSensor(letter, height)
+            obj.radialVal = double(uint8(letter) - 65);
+            obj.z = height;
+            theta = deg2rad(18*obj.radialVal);
+            r = 3.5*2.75/(sqrt((2.75*cos(theta))^2+(3.5*sin(theta))^2));
+            obj.x = r*cos(theta);
+            obj.y = r*sin(theta);
         end
     end
     methods (Static)
