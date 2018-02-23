@@ -23,6 +23,9 @@ classdef PressureSensor
             arcLength = dTheta * (r2 + obj.r)/2;
             dist = arcLength^2 + (z-obj.z)^2;
         end
+        function name = getName(obj)
+            name = sprintf('%s%d',char(obj.radialVal+65),obj.z);
+        end
     end
 end
 
